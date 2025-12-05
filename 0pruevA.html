@@ -1,0 +1,2151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Inventory Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gold-primary: #d4af37;
+            --gold-secondary: #c5a028;
+            --gold-dark: #b8941f;
+            --black-primary: #0a0a0a;
+            --black-secondary: #1a1a1a;
+            --gray-dark: #2a2a2a;
+            --gray-medium: #404040;
+            --gray-light: #666666;
+            --white: #ffffff;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--black-primary);
+            color: var(--white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 280px;
+            background: var(--black-secondary);
+            border-right: 1px solid var(--gold-primary);
+            padding: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-section {
+            padding: 30px 25px;
+            border-bottom: 1px solid var(--gray-dark);
+            background: linear-gradient(135deg, var(--black-primary) 0%, var(--black-secondary) 100%);
+        }
+
+        .logo-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: var(--gold-primary);
+            letter-spacing: -0.5px;
+            margin-bottom: 5px;
+        }
+
+        .logo-subtitle {
+            font-size: 0.75em;
+            color: var(--gray-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-menu {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            padding: 16px 25px;
+            color: var(--gray-light);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.95em;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: var(--gray-dark);
+            color: var(--gold-primary);
+            border-left-color: var(--gold-primary);
+        }
+
+        .nav-item.active {
+            background: var(--gray-dark);
+            color: var(--gold-primary);
+            border-left-color: var(--gold-primary);
+        }
+
+        .nav-icon {
+            font-size: 1.3em;
+            width: 24px;
+            text-align: center;
+        }
+
+        .user-section {
+            padding: 20px 25px;
+            border-top: 1px solid var(--gray-dark);
+            background: var(--black-primary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--black-primary);
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .user-role {
+            font-size: 0.75em;
+            color: var(--gray-light);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+            background: var(--black-primary);
+        }
+
+        .top-bar {
+            background: var(--black-secondary);
+            border-bottom: 1px solid var(--gray-dark);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title-section h1 {
+            font-size: 1.8em;
+            color: var(--white);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .breadcrumb {
+            font-size: 0.85em;
+            color: var(--gray-light);
+        }
+
+        .breadcrumb span {
+            color: var(--gold-primary);
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .icon-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--gray-dark);
+            border: none;
+            color: var(--gray-light);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .icon-button:hover {
+            background: var(--gray-medium);
+            color: var(--gold-primary);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: var(--white);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7em;
+            font-weight: bold;
+            border: 2px solid var(--black-secondary);
+        }
+
+        .notification-badge.hidden {
+            display: none;
+        }
+
+        /* CONTENT AREA */
+        .content-area {
+            padding: 40px;
+        }
+
+        .view {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* DASHBOARD */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        .metric-card {
+            background: var(--black-secondary);
+            border: 1px solid var(--gray-dark);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s;
+        }
+
+        .metric-card:hover {
+            border-color: var(--gold-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.15);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .metric-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4em;
+            background: var(--gray-dark);
+        }
+
+        .metric-value {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: var(--gold-primary);
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            color: var(--gray-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-change {
+            font-size: 0.85em;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--gray-dark);
+        }
+
+        .change-positive {
+            color: var(--success);
+        }
+
+        .change-negative {
+            color: var(--danger);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: var(--black-secondary);
+            border: 1px solid var(--gray-dark);
+            border-radius: 12px;
+            padding: 30px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-dark);
+        }
+
+        .card-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--white);
+        }
+
+        .quick-actions {
+            display: grid;
+            gap: 15px;
+        }
+
+        .action-btn {
+            padding: 18px 20px;
+            background: var(--gray-dark);
+            border: 1px solid var(--gray-medium);
+            border-radius: 10px;
+            color: var(--white);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-align: left;
+            font-size: 0.95em;
+        }
+
+        .action-btn:hover {
+            background: var(--gray-medium);
+            border-color: var(--gold-primary);
+            transform: translateX(5px);
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: var(--gold-primary);
+            color: var(--black-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        /* FORMULARIO */
+        .form-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .form-card {
+            background: var(--black-secondary);
+            border: 1px solid var(--gray-dark);
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 25px;
+        }
+
+        .form-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--gray-dark);
+        }
+
+        .form-header h2 {
+            font-size: 1.5em;
+            color: var(--gold-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-header p {
+            color: var(--gray-light);
+            font-size: 0.9em;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            color: var(--white);
+            margin-bottom: 10px;
+            font-weight: 500;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .required {
+            color: var(--danger);
+        }
+
+        input, select, textarea {
+            padding: 14px 16px;
+            background: var(--gray-dark);
+            border: 1px solid var(--gray-medium);
+            border-radius: 8px;
+            color: var(--white);
+            font-size: 0.95em;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--gold-primary);
+            background: var(--black-secondary);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            padding-top: 20px;
+            border-top: 1px solid var(--gray-dark);
+        }
+
+        .btn {
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: var(--black-primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--gray-dark);
+            color: var(--white);
+            border: 1px solid var(--gray-medium);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-medium);
+        }
+
+        /* TABLA */
+        .table-card {
+            background: var(--black-secondary);
+            border: 1px solid var(--gray-dark);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 25px 30px;
+            background: var(--black-primary);
+            border-bottom: 1px solid var(--gray-dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding-left: 45px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-light);
+        }
+
+        .table-filters {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: var(--gray-dark);
+            border: 1px solid var(--gray-medium);
+            border-radius: 8px;
+            color: var(--white);
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--gold-primary);
+            color: var(--gold-primary);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--gray-dark);
+        }
+
+        th {
+            padding: 16px 20px;
+            text-align: left;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--gold-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--gray-medium);
+        }
+
+        td {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--gray-dark);
+            font-size: 0.9em;
+        }
+
+        tbody tr {
+            transition: all 0.3s;
+        }
+
+        tbody tr:hover {
+            background: var(--gray-dark);
+        }
+
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            display: inline-block;
+        }
+
+        .badge-success {
+            background: rgba(46, 204, 113, 0.15);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .badge-warning {
+            background: rgba(243, 156, 18, 0.15);
+            color: var(--warning);
+            border: 1px solid var(--warning);
+        }
+
+        .badge-danger {
+            background: rgba(231, 76, 60, 0.15);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-icon-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9em;
+        }
+
+        .btn-edit-action {
+            background: rgba(46, 204, 113, 0.15);
+            color: var(--success);
+        }
+
+        .btn-edit-action:hover {
+            background: var(--success);
+            color: var(--white);
+        }
+
+        .btn-delete-action {
+            background: rgba(231, 76, 60, 0.15);
+            color: var(--danger);
+        }
+
+        .btn-report-action {
+            background: rgba(243, 156, 18, 0.15);
+            color: var(--warning);
+        }
+
+        .btn-report-action:hover {
+            background: var(--warning);
+            color: var(--white);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--gray-light);
+        }
+
+        .empty-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            color: var(--white);
+            margin-bottom: 10px;
+        }
+
+        /* MODAL DE NOTIFICACIONES Y AYUDA */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9998;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-container {
+            background: var(--black-secondary);
+            border: 1px solid var(--gold-primary);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--gray-dark);
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            color: var(--gold-primary);
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--gray-light);
+            font-size: 1.8em;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: var(--gold-primary);
+            transform: rotate(90deg);
+        }
+
+        .modal-content {
+            color: var(--white);
+        }
+
+        .notification-item {
+            background: var(--gray-dark);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 3px solid var(--gold-primary);
+        }
+
+        .notification-item.unread {
+            border-left-color: var(--warning);
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: var(--gold-primary);
+            margin-bottom: 5px;
+        }
+
+        .notification-text {
+            color: var(--gray-light);
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .notification-time {
+            color: var(--gray-light);
+            font-size: 0.8em;
+            margin-top: 8px;
+        }
+
+        .help-section {
+            margin-bottom: 25px;
+        }
+
+        .help-section h3 {
+            color: var(--gold-primary);
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .help-section p {
+            color: var(--gray-light);
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+
+        .help-section ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .help-section li {
+            color: var(--gray-light);
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .help-section li:before {
+            content: "→";
+            color: var(--gold-primary);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        /* SPLASH SCREEN */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .splash-screen.hidden {
+            animation: fadeOut 0.8s ease-in-out forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        .splash-logo-container {
+            position: relative;
+            animation: zoomIn 1s ease-out;
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .splash-logo {
+            max-width: 300px;
+            max-height: 300px;
+            width: auto;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(212, 175, 55, 0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 50px rgba(212, 175, 55, 0.5);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 80px rgba(212, 175, 55, 0.8);
+                transform: scale(1.05);
+            }
+        }
+
+        .splash-title {
+            margin-top: 40px;
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--gold-primary);
+            letter-spacing: 2px;
+            animation: slideUp 1s ease-out 0.3s both;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .splash-subtitle {
+            margin-top: 10px;
+            font-size: 1em;
+            color: var(--gray-light);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            animation: slideUp 1s ease-out 0.5s both;
+        }
+
+        .splash-loader {
+            margin-top: 50px;
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--gray-dark);
+            border-top: 4px solid var(--gold-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite, slideUp 1s ease-out 0.7s both;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .splash-loading-text {
+            margin-top: 20px;
+            color: var(--gray-light);
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            animation: slideUp 1s ease-out 0.9s both;
+        }
+
+        /* LOGIN SCREEN */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0f0f0f;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-overlay.hidden {
+            display: none;
+        }
+
+        .login-container {
+            background-color: #151515;
+            width: 380px;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(255, 204, 0, 0.2);
+            border: 1px solid #ffc400;
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .login-logo-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffc400;
+            letter-spacing: -0.5px;
+            margin-bottom: 5px;
+        }
+
+        .login-logo-subtitle {
+            font-size: 11px;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .login-container h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 24px;
+            color: #ffc400;
+        }
+
+        .login-container label {
+            font-size: 14px;
+            color: #eee;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .input-box {
+            width: 100%;
+            padding: 12px;
+            margin: 0 0 20px 0;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #1f1f1f;
+            color: #fff;
+            box-sizing: border-box;
+        }
+
+        .input-box:focus {
+            border-color: #ffc400;
+            outline: none;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background-color: #ffc400;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        .login-btn:hover {
+            background-color: #e0ac00;
+        }
+
+        .error-msg {
+            color: #ff4b4b;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 14px;
+            display: none;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content-area {
+                padding: 20px;
+            }
+
+            .top-bar {
+                padding: 15px 20px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- SPLASH SCREEN -->
+    <div id="splashScreen" class="splash-screen">
+        <div class="splash-logo-container">
+            <!-- REEMPLAZA ESTE SRC CON LA RUTA DE TU LOGO -->
+            <img src="Gemini_Generated_Image_jvhdttjvhdttjvhd.jpg" alt="Logo" class="splash-logo" id="splashLogo">
+        </div>
+        <div class="splash-title">ENTERPRISE</div>
+        <div class="splash-subtitle">INVENTORY MANAGEMENT SYSTEM</div>
+        <div class="splash-loader"></div>
+        <div class="splash-loading-text">Cargando sistema...</div>
+    </div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-container">
+            <div class="login-logo">
+                <div class="login-logo-title">ENTERPRISE</div>
+                <div class="login-logo-subtitle">UNIVERSAL COMPANY</div>
+            </div>
+            <h2>Iniciar Sesión</h2>
+            <p id="error" class="error-msg">Usuario o contraseña incorrectos</p>
+            <form id="loginForm">
+                <label for="usuario">Usuario</label>
+                <input type="text" id="usuario" class="input-box" placeholder="Ingrese su usuario" required>
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" class="input-box" placeholder="Ingrese su contraseña" required>
+                <button type="submit" class="login-btn">Ingresar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo-section">
+            <div class="logo-title">ENTERPRISE</div>
+            <div class="logo-subtitle">UNIVERSAL COMPANY</div>
+        </div>
+
+        <nav class="nav-menu">
+            <div class="nav-item active" onclick="showView('dashboard')">
+                <span class="nav-icon">📊</span>
+                <span>Panel de Control</span>
+            </div>
+            <div class="nav-item" onclick="showView('inventory')">
+                <span class="nav-icon">📦</span>
+                <span>Inventario</span>
+            </div>
+            <div class="nav-item" onclick="showView('add')">
+                <span class="nav-icon">➕</span>
+                <span>Nuevo Artículo</span>
+            </div>
+            <div class="nav-item" onclick="showView('reports')">
+                <span class="nav-icon">📈</span>
+                <span>Reportes</span>
+            </div>
+            <div class="nav-item" onclick="showView('settings')">
+                <span class="nav-icon">⚙️</span>
+                <span>Configuración</span>
+            </div>
+            <div class="nav-item" onclick="logout()" style="border-top: 1px solid var(--gray-dark); margin-top: 10px; padding-top: 26px;">
+                <span class="nav-icon">🚪</span>
+                <span>Cerrar Sesión</span>
+            </div>
+        </nav>
+
+        <div class="user-section">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">AD</div>
+                <div class="user-details">
+                    <div class="user-name" id="userName">Administrador</div>
+                    <div class="user-role">Sistema</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <div class="top-bar">
+            <div class="page-title-section">
+                <h1 id="pageTitle">Panel de Control</h1>
+                <div class="breadcrumb">Inicio / <span id="breadcrumbCurrent">Panel de Control</span></div>
+            </div>
+            <div class="top-actions">
+                <button class="icon-button" title="Notificaciones" onclick="showNotifications()">
+                    🔔
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </button>
+                <button class="icon-button" title="Ayuda" onclick="showHelp()">❓</button>
+                <button class="icon-button" title="Cerrar Sesión" onclick="logout()">🚪</button>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <!-- DASHBOARD VIEW -->
+            <div id="dashboard" class="view active">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <div class="metric-icon">📦</div>
+                        </div>
+                        <div class="metric-value" id="dashTotal">0</div>
+                        <div class="metric-label">Total Artículos</div>
+                        <div class="metric-change change-positive">↑ 0% vs mes anterior</div>
+                    </div>
+                    <div class="metric-card" style="cursor: pointer;" onclick="showNotifications()">
+                        <div class="metric-header">
+                            <div class="metric-icon">🔔</div>
+                        </div>
+                        <div class="metric-value" id="dashAlerts">0</div>
+                        <div class="metric-label">Alertas</div>
+                        <div class="metric-change">Notificaciones</div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Resumen del Sistema</h3>
+                        </div>
+                        <p style="color: var(--gray-light); line-height: 1.8;">
+                            Sistema de gestión de inventario empresarial diseñado para optimizar el control de activos, 
+                            proporcionar análisis en tiempo real y facilitar la toma de decisiones estratégicas. 
+                            Monitoree, gestione y optimice su inventario con precisión profesional.
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Acciones Rápidas</h3>
+                        </div>
+                        <div class="quick-actions">
+                            <button class="action-btn" onclick="showView('add')">
+                                <div class="action-icon">+</div>
+                                <div>
+                                    <div style="font-weight: 600;">Nuevo Artículo</div>
+                                    <div style="font-size: 0.85em; color: var(--gray-light);">Agregar al inventario</div>
+                                </div>
+                            </button>
+                            <button class="action-btn" onclick="showView('inventory')">
+                                <div class="action-icon">📋</div>
+                                <div>
+                                    <div style="font-weight: 600;">Ver Inventario</div>
+                                    <div style="font-size: 0.85em; color: var(--gray-light);">Gestionar artículos</div>
+                                </div>
+                            </button>
+                            <button class="action-btn" onclick="showView('reports')">
+                                <div class="action-icon">📊</div>
+                                <div>
+                                    <div style="font-weight: 600;">Generar Reporte</div>
+                                    <div style="font-size: 0.85em; color: var(--gray-light);">Análisis detallado</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ADD/EDIT VIEW -->
+            <div id="add" class="view">
+                <div class="form-container">
+                    <div class="form-card">
+                        <div class="form-header">
+                            <h2 id="formTitle">Registrar Nuevo Artículo</h2>
+                            <p>Complete todos los campos requeridos para agregar un artículo al inventario</p>
+                        </div>
+
+                        <form id="inventoryForm">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Nombre del Artículo <span class="required">*</span></label>
+                                    <input type="text" id="itemName" required placeholder="Ej: Laptop Dell Latitude 7420">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Código/SKU</label>
+                                    <input type="text" id="itemSKU" placeholder="Ej: LAP-DEL-7420">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Categoría <span class="required">*</span></label>
+                                    <select id="itemCategory" required>
+                                        <option value="">Seleccionar categoría</option>
+                                        <option value="Electrónica">Electrónica</option>
+                                        <option value="Mobiliario">Mobiliario</option>
+                                        <option value="Papelería">Papelería</option>
+                                        <option value="Equipamiento">Equipamiento</option>
+                                        <option value="Consumibles">Consumibles</option>
+                                        <option value="Hardware">Hardware</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Subcategoría</label>
+                                    <input type="text" id="itemSubcategory" placeholder="Ej: Portátiles">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Cantidad <span class="required">*</span></label>
+                                    <input type="number" id="itemQuantity" min="0" required placeholder="0">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Precio Unitario <span class="required">*</span></label>
+                                    <input type="number" id="itemPrice" min="0" step="0.01" required placeholder="0.00">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Ubicación Física</label>
+                                    <input type="text" id="itemLocation" placeholder="Ej: Almacén A - Estante 12">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Proveedor</label>
+                                    <input type="text" id="itemSupplier" placeholder="Nombre del proveedor">
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label>Descripción / Notas</label>
+                                    <textarea id="itemNotes" placeholder="Información adicional sobre el artículo..."></textarea>
+                                </div>
+
+                                <div class="form-group full-width">
+                                    <label>Imagen del Artículo</label>
+                                    <input type="file" id="itemImage" accept="image/*" onchange="previewImage(event)" style="margin-bottom: 15px;">
+                                    <div id="imagePreview" style="display: none; margin-top: 10px;">
+                                        <img id="previewImg" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid var(--gold-primary);">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary" id="cancelBtn" onclick="cancelEdit()">Cancelar</button>
+                                <button type="submit" class="btn btn-primary" id="submitBtn">Guardar Artículo</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- INVENTORY VIEW -->
+            <div id="inventory" class="view">
+                <div class="metrics-grid" style="margin-bottom: 25px;">
+                    <div class="metric-card">
+                        <div class="metric-value" id="invTotal">0</div>
+                        <div class="metric-label">Total Artículos</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="invCategories">0</div>
+                        <div class="metric-label">Categorías</div>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="searchInput" placeholder="Buscar artículos..." onkeyup="searchInventory()">
+                        </div>
+                        <div class="table-filters">
+                            <button class="filter-btn" onclick="exportToCSV()">📥 Exportar</button>
+                            <button class="filter-btn" onclick="showView('add')">➕ Agregar</button>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table id="inventoryTable">
+                            <thead>
+                                <tr>
+                                    <th>Imagen</th>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Categoría</th>
+                                    <th>Cantidad</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryTableBody">
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="empty-state">
+                                            <div class="empty-icon">📦</div>
+                                            <h3>No hay artículos registrados</h3>
+                                            <p>Comienza agregando tu primer artículo al inventario</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REPORTS VIEW -->
+            <div id="reports" class="view">
+                <div class="metrics-grid" style="margin-bottom: 25px;">
+                    <div class="metric-card">
+                        <div class="metric-icon">📊</div>
+                        <div class="metric-value" id="reportTotal">0</div>
+                        <div class="metric-label">Total Items</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">🏆</div>
+                        <div class="metric-value" id="reportTop">-</div>
+                        <div class="metric-label">Categoría Top</div>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-header">
+                        <div class="search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="searchReportInput" placeholder="Buscar artículos para reportar..." onkeyup="searchReportInventory()">
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table id="reportInventoryTable">
+                            <thead>
+                                <tr>
+                                    <th>Imagen</th>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Categoría</th>
+                                    <th>Cantidad</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportInventoryTableBody">
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="empty-state">
+                                            <div class="empty-icon">📦</div>
+                                            <h3>No hay artículos registrados</h3>
+                                            <p>Comienza agregando artículos al inventario</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-top: 25px;">
+                    <div class="card-header">
+                        <h3 class="card-title">🎯 Acciones de Reporte</h3>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; padding: 20px;">
+                        <button class="btn btn-secondary" onclick="exportToCSV()">📊 Exportar a Excel</button>
+                        <button class="btn btn-secondary" onclick="printReport()">🖨️ Imprimir Reporte</button>
+                        <button class="btn btn-secondary" onclick="emailReport()">📧 Enviar por Email</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS VIEW -->
+            <div id="settings" class="view">
+                <div class="form-container">
+                    <div class="form-card">
+                        <div class="form-header">
+                            <h2>⚙️ Configuración del Sistema</h2>
+                            <p>Personaliza las opciones del sistema de inventario</p>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group full-width">
+                                <label>Nombre de la Empresa</label>
+                                <input type="text" id="companyName" placeholder="Mi Empresa S.A." value="Enterprise IMS">
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label>Categorías Personalizadas (separadas por comas)</label>
+                                <textarea id="customCategories" placeholder="Electrónica, Mobiliario, Papelería...">Electrónica, Mobiliario, Papelería, Equipamiento, Consumibles, Hardware</textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button class="btn btn-primary" onclick="saveSettings()">💾 Guardar Configuración</button>
+                        </div>
+                    </div>
+
+                    <div class="form-card">
+                        <div class="form-header">
+                            <h2>📊 Estadísticas del Sistema</h2>
+                            <p>Información sobre el uso del sistema</p>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                            <div style="background: var(--gray-dark); padding: 20px; border-radius: 8px;">
+                                <div style="color: var(--gray-light); font-size: 0.9em; margin-bottom: 5px;">Espacio Utilizado</div>
+                                <div style="color: var(--gold-primary); font-size: 1.5em; font-weight: bold;" id="storageUsed">0 KB</div>
+                            </div>
+                            <div style="background: var(--gray-dark); padding: 20px; border-radius: 8px;">
+                                <div style="color: var(--gray-light); font-size: 0.9em; margin-bottom: 5px;">Última Modificación</div>
+                                <div style="color: var(--gold-primary); font-size: 1.5em; font-weight: bold;" id="lastModified">-</div>
+                            </div>
+                            <div style="background: var(--gray-dark); padding: 20px; border-radius: 8px;">
+                                <div style="color: var(--gray-light); font-size: 0.9em; margin-bottom: 5px;">Total de Registros</div>
+                                <div style="color: var(--gold-primary); font-size: 1.5em; font-weight: bold;" id="totalRecords">0</div>
+                            </div>
+                            <div style="background: var(--gray-dark); padding: 20px; border-radius: 8px;">
+                                <div style="color: var(--gray-light); font-size: 0.9em; margin-bottom: 5px;">Versión</div>
+                                <div style="color: var(--gold-primary); font-size: 1.5em; font-weight: bold;">v1.0.0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL DE NOTIFICACIONES -->
+    <div id="notificationsModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title">🔔 Notificaciones</h2>
+                <button class="modal-close" onclick="closeNotifications()">×</button>
+            </div>
+            <div class="modal-content" id="notificationsContent">
+                <div class="notification-item unread">
+                    <div class="notification-title">Sistema actualizado</div>
+                    <div class="notification-text">El sistema de inventario ha sido actualizado exitosamente.</div>
+                    <div class="notification-time">Hace 2 horas</div>
+                </div>
+                <div class="notification-item">
+                    <div class="notification-title">Bienvenido al sistema</div>
+                    <div class="notification-text">Gracias por usar Enterprise Inventory Management System.</div>
+                    <div class="notification-time">Hoy</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE AYUDA -->
+    <div id="helpModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title">❓ Centro de Ayuda</h2>
+                <button class="modal-close" onclick="closeHelp()">×</button>
+            </div>
+            <div class="modal-content">
+                <div class="help-section">
+                    <h3>📦 Gestión de Inventario</h3>
+                    <p>Aprende a gestionar tu inventario de manera eficiente:</p>
+                    <ul>
+                        <li>Usa "Nuevo Artículo" para agregar productos con imagen</li>
+                        <li>Edita artículos haciendo clic en el botón de edición ✏️</li>
+                        <li>Elimina productos que ya no necesites con el botón 🗑️</li>
+                        <li>Usa el buscador para encontrar artículos rápidamente</li>
+                    </ul>
+                </div>
+                
+                <div class="help-section">
+                    <h3>📊 Reportes</h3>
+                    <p>Genera reportes de tus productos:</p>
+                    <ul>
+                        <li>Ve a la sección "Reportes" para ver todos tus artículos</li>
+                        <li>Usa el botón "Reportar" ⚠️ para notificar problemas</li>
+                        <li>Exporta tus datos a Excel o PDF</li>
+                        <li>Imprime reportes cuando lo necesites</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3>⚙️ Configuración</h3>
+                    <p>Personaliza el sistema según tus necesidades:</p>
+                    <ul>
+                        <li>Cambia el nombre de tu empresa</li>
+                        <li>Ajusta la moneda predeterminada</li>
+                        <li>Personaliza las categorías de productos</li>
+                        <li>Respalda tus datos regularmente</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3>🔐 Seguridad</h3>
+                    <p>Tu información está protegida:</p>
+                    <ul>
+                        <li>Los datos se guardan localmente en tu navegador</li>
+                        <li>Haz respaldos periódicos de tu información</li>
+                        <li>Cierra sesión al terminar de usar el sistema</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h3>📞 Soporte</h3>
+                    <p>¿Necesitas más ayuda? Contacta con soporte técnico:</p>
+                    <ul>
+                        <li>Email: soporte@enterprise.com</li>
+                        <li>Teléfono: +52 (55) 1234-5678</li>
+                        <li>Horario: Lunes a Viernes 9:00 - 18:00</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- SPLASH SCREEN ---
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('splashScreen').classList.add('hidden');
+            }, 3000); // Mostrar splash por 3 segundos
+        });
+
+        // --- SCRIPT DEL LOGIN ---
+        document.getElementById("loginForm").addEventListener("submit", function(e){
+            e.preventDefault();
+            const user = document.getElementById("usuario").value.trim();
+            const pass = document.getElementById("password").value.trim();
+            if (user === "admin" && pass === "admin123") {
+                document.getElementById("loginOverlay").classList.add("hidden");
+            } else {
+                document.getElementById("error").style.display = "block";
+            }
+        });
+
+        // Previsualizar imagen
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // --- FUNCIÓN PARA CERRAR SESIÓN ---
+        function logout() {
+            document.getElementById("loginOverlay").classList.remove("hidden");
+            document.getElementById("usuario").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("error").style.display = "none";
+            showView('dashboard');
+        }
+
+        // Base de datos en memoria
+        let inventory = [];
+        let editingIndex = null;
+        let notifications = [
+            {
+                id: 1,
+                title: "Sistema actualizado",
+                text: "El sistema de inventario ha sido actualizado exitosamente.",
+                time: "Hace 2 horas",
+                unread: true
+            },
+            {
+                id: 2,
+                title: "Bienvenido al sistema",
+                text: "Gracias por usar Enterprise Inventory Management System.",
+                time: "Hoy",
+                unread: false
+            }
+        ];
+
+        // Cargar datos desde localStorage al iniciar
+        function loadData() {
+            const saved = localStorage.getItem('inventoryData');
+            if (saved) {
+                inventory = JSON.parse(saved);
+                updateAllMetrics();
+                renderInventoryTable();
+            }
+            
+            const savedNotifications = localStorage.getItem('notificationsData');
+            if (savedNotifications) {
+                notifications = JSON.parse(savedNotifications);
+            }
+        }
+
+        // Guardar datos en localStorage
+        function saveData() {
+            localStorage.setItem('inventoryData', JSON.stringify(inventory));
+            localStorage.setItem('notificationsData', JSON.stringify(notifications));
+        }
+
+        // Función para cambiar de vista
+        function showView(viewName) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewName).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            
+            const titles = {
+                'dashboard': 'Panel de Control',
+                'inventory': 'Inventario',
+                'add': editingIndex !== null ? 'Editar Artículo' : 'Nuevo Artículo',
+                'reports': 'Reportes',
+                'settings': 'Configuración'
+            };
+            
+            document.getElementById('pageTitle').textContent = titles[viewName] || 'Panel de Control';
+            document.getElementById('breadcrumbCurrent').textContent = titles[viewName] || 'Panel de Control';
+            
+            if (viewName === 'add' && editingIndex === null) {
+                resetForm();
+            }
+            
+            if (viewName === 'inventory') {
+                renderInventoryTable();
+                updateInventoryMetrics();
+            }
+
+            if (viewName === 'reports') {
+                renderReportInventoryTable();
+                updateReportMetrics();
+            }
+            
+            if (viewName === 'dashboard') {
+                updateDashboardMetrics();
+            }
+        }
+
+        // Resetear formulario
+        function resetForm() {
+            document.getElementById('inventoryForm').reset();
+            document.getElementById('formTitle').textContent = 'Registrar Nuevo Artículo';
+            document.getElementById('cancelBtn').style.display = 'none';
+            document.getElementById('imagePreview').style.display = 'none';
+            editingIndex = null;
+        }
+
+        // Cancelar edición
+        function cancelEdit() {
+            resetForm();
+            showView('inventory');
+        }
+
+        // Manejar envío del formulario
+        document.getElementById('inventoryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const imageFile = document.getElementById('itemImage').files[0];
+            let imageData = '';
+            
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imageData = e.target.result;
+                    saveItem(imageData);
+                };
+                reader.readAsDataURL(imageFile);
+            } else {
+                if (editingIndex !== null && inventory[editingIndex].image) {
+                    imageData = inventory[editingIndex].image;
+                }
+                saveItem(imageData);
+            }
+        });
+
+        function saveItem(imageData) {
+            const item = {
+                id: editingIndex !== null ? inventory[editingIndex].id : Date.now(),
+                name: document.getElementById('itemName').value,
+                sku: document.getElementById('itemSKU').value || 'N/A',
+                category: document.getElementById('itemCategory').value,
+                subcategory: document.getElementById('itemSubcategory').value || 'N/A',
+                quantity: parseInt(document.getElementById('itemQuantity').value),
+                price: parseFloat(document.getElementById('itemPrice').value),
+                location: document.getElementById('itemLocation').value || 'N/A',
+                supplier: document.getElementById('itemSupplier').value || 'N/A',
+                notes: document.getElementById('itemNotes').value || '',
+                image: imageData,
+                dateAdded: editingIndex !== null ? inventory[editingIndex].dateAdded : new Date().toISOString()
+            };
+            
+            if (editingIndex !== null) {
+                inventory[editingIndex] = item;
+                editingIndex = null;
+            } else {
+                inventory.push(item);
+            }
+            
+            saveData();
+            updateAllMetrics();
+            resetForm();
+            showView('inventory');
+        }
+
+        // Actualizar badge de notificaciones
+        function updateNotificationBadge() {
+            const unreadCount = notifications.filter(n => n.unread).length;
+            const badge = document.getElementById('notificationBadge');
+            
+            if (unreadCount > 0) {
+                badge.textContent = unreadCount;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // Renderizar tabla de inventario
+        function renderInventoryTable(items = inventory) {
+            const tbody = document.getElementById('inventoryTableBody');
+            
+            if (items.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-icon">📦</div>
+                                <h3>No hay artículos registrados</h3>
+                                <p>Comienza agregando tu primer artículo al inventario</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = items.map((item, index) => {
+                const imageHTML = item.image ? 
+                    `<img src="${item.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 2px solid var(--gold-primary);">` : 
+                    `<div style="width: 50px; height: 50px; background: var(--gray-dark); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5em;">📦</div>`;
+                
+                return `
+                    <tr>
+                        <td>${imageHTML}</td>
+                        <td>${item.sku}</td>
+                        <td><strong>${item.name}</strong></td>
+                        <td>${item.category}</td>
+                        <td>${item.quantity}</td>
+                        <td>
+                            <div class="table-actions">
+                                <button class="action-icon-btn btn-edit-action" onclick="editItem(${inventory.indexOf(item)})" title="Editar">✏️</button>
+                                <button class="action-icon-btn btn-delete-action" onclick="deleteItem(${inventory.indexOf(item)})" title="Eliminar">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Editar artículo
+        function editItem(index) {
+            editingIndex = index;
+            const item = inventory[index];
+            
+            document.getElementById('itemName').value = item.name;
+            document.getElementById('itemSKU').value = item.sku === 'N/A' ? '' : item.sku;
+            document.getElementById('itemCategory').value = item.category;
+            document.getElementById('itemSubcategory').value = item.subcategory === 'N/A' ? '' : item.subcategory;
+            document.getElementById('itemQuantity').value = item.quantity;
+            document.getElementById('itemPrice').value = item.price;
+            document.getElementById('itemLocation').value = item.location === 'N/A' ? '' : item.location;
+            document.getElementById('itemSupplier').value = item.supplier === 'N/A' ? '' : item.supplier;
+            document.getElementById('itemNotes').value = item.notes;
+            
+            if (item.image) {
+                document.getElementById('previewImg').src = item.image;
+                document.getElementById('imagePreview').style.display = 'block';
+            }
+            
+            document.getElementById('formTitle').textContent = 'Editar Artículo';
+            document.getElementById('cancelBtn').style.display = 'inline-block';
+            
+            showView('add');
+        }
+
+        // Eliminar artículo
+        function deleteItem(index) {
+            if (confirm('¿Estás seguro de que deseas eliminar este artículo?')) {
+                inventory.splice(index, 1);
+                saveData();
+                updateAllMetrics();
+                renderInventoryTable();
+            }
+        }
+
+        // Buscar en inventario
+        function searchInventory() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = inventory.filter(item => 
+                item.name.toLowerCase().includes(searchTerm) ||
+                item.sku.toLowerCase().includes(searchTerm) ||
+                item.category.toLowerCase().includes(searchTerm)
+            );
+            renderInventoryTable(filtered);
+        }
+
+        // Renderizar tabla de reportes
+        function renderReportInventoryTable(items = inventory) {
+            const tbody = document.getElementById('reportInventoryTableBody');
+            
+            if (items.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-icon">📦</div>
+                                <h3>No hay artículos registrados</h3>
+                                <p>Comienza agregando artículos al inventario</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = items.map((item, index) => {
+                const imageHTML = item.image ? 
+                    `<img src="${item.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 2px solid var(--gold-primary);">` : 
+                    `<div style="width: 50px; height: 50px; background: var(--gray-dark); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5em;">📦</div>`;
+                
+                return `
+                    <tr>
+                        <td>${imageHTML}</td>
+                        <td>${item.sku}</td>
+                        <td><strong>${item.name}</strong></td>
+                        <td>${item.category}</td>
+                        <td>${item.quantity}</td>
+                        <td>
+                            <div class="table-actions">
+                                <button class="action-icon-btn btn-report-action" onclick="reportItem(${inventory.indexOf(item)})" title="Reportar">⚠️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Buscar en tabla de reportes
+        function searchReportInventory() {
+            const searchTerm = document.getElementById('searchReportInput').value.toLowerCase();
+            const filtered = inventory.filter(item => 
+                item.name.toLowerCase().includes(searchTerm) ||
+                item.sku.toLowerCase().includes(searchTerm) ||
+                item.category.toLowerCase().includes(searchTerm)
+            );
+            renderReportInventoryTable(filtered);
+        }
+
+        // Reportar artículo
+        function reportItem(index) {
+            const item = inventory[index];
+            const reason = prompt(`Reportar problema con: ${item.name}\n\nEscribe el motivo del reporte:\n(Ej: Sin stock, defectuoso, faltante, etc.)`);
+            
+            if (reason && reason.trim() !== '') {
+                // Agregar notificación
+                const newNotification = {
+                    id: Date.now(),
+                    title: `Reporte: ${item.name}`,
+                    text: `Motivo: ${reason}. Código: ${item.sku}`,
+                    time: "Ahora mismo",
+                    unread: true
+                };
+                notifications.unshift(newNotification);
+                saveData();
+                
+                // Actualizar todo inmediatamente
+                updateNotificationBadge();
+                updateDashboardMetrics();
+                
+                alert(`✅ Reporte registrado exitosamente:\n\n📦 Artículo: ${item.name}\n🔖 Código: ${item.sku}\n⚠️ Motivo: ${reason}\n\n🔔 Se ha enviado la notificación al departamento correspondiente.\n\n👉 Revisa el Panel de Control para ver las alertas.`);
+            }
+        }
+
+        // Actualizar métricas de reportes
+        function updateReportMetrics() {
+            const total = inventory.length;
+            
+            const categories = {};
+            inventory.forEach(item => {
+                categories[item.category] = (categories[item.category] || 0) + 1;
+            });
+            const topCategory = Object.keys(categories).length > 0 ? 
+                Object.keys(categories).reduce((a, b) => categories[a] > categories[b] ? a : b) : '-';
+            
+            document.getElementById('reportTotal').textContent = total;
+            document.getElementById('reportTop').textContent = topCategory;
+        }
+
+        // Actualizar todas las métricas
+        function updateAllMetrics() {
+            updateDashboardMetrics();
+            updateInventoryMetrics();
+            updateNotificationBadge();
+        }
+
+        // Actualizar métricas del dashboard
+        function updateDashboardMetrics() {
+            const total = inventory.length;
+            const unreadNotifications = notifications.filter(n => n.unread).length;
+            
+            document.getElementById('dashTotal').textContent = total;
+            document.getElementById('dashAlerts').textContent = unreadNotifications;
+        }
+
+        // Actualizar métricas de inventario
+        function updateInventoryMetrics() {
+            const total = inventory.length;
+            const categories = [...new Set(inventory.map(item => item.category))].length;
+            
+            document.getElementById('invTotal').textContent = total;
+            document.getElementById('invCategories').textContent = categories;
+        }
+
+        // Exportar a CSV
+        function exportToCSV() {
+            if (inventory.length === 0) {
+                alert('No hay datos para exportar');
+                return;
+            }
+            
+            const headers = ['Código', 'Nombre', 'Categoría', 'Subcategoría', 'Cantidad', 'Precio', 'Valor Total', 'Ubicación', 'Proveedor', 'Notas'];
+            const rows = inventory.map(item => [
+                item.sku,
+                item.name,
+                item.category,
+                item.subcategory,
+                item.quantity,
+                item.price,
+                (item.quantity * item.price).toFixed(2),
+                item.location,
+                item.supplier,
+                item.notes
+            ]);
+            
+            let csv = '\uFEFF';
+            csv += headers.join(',') + '\n';
+            rows.forEach(row => {
+                csv += row.map(cell => `"${cell}"`).join(',') + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `inventario_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Funciones de modales
+        function showNotifications() { 
+            renderNotifications();
+            document.getElementById('notificationsModal').classList.add('show');
+            // Marcar todas como leídas al abrir
+            setTimeout(() => {
+                notifications.forEach(n => n.unread = false);
+                saveData();
+                updateNotificationBadge();
+                updateDashboardMetrics();
+            }, 500);
+        }
+        
+        function closeNotifications() {
+            document.getElementById('notificationsModal').classList.remove('show');
+        }
+        
+        function renderNotifications() {
+            const content = document.getElementById('notificationsContent');
+            if (notifications.length === 0) {
+                content.innerHTML = '<p style="text-align: center; color: var(--gray-light); padding: 20px;">No hay notificaciones</p>';
+                return;
+            }
+            
+            content.innerHTML = notifications.map(notif => `
+                <div class="notification-item ${notif.unread ? 'unread' : ''}">
+                    <div class="notification-title">${notif.title}</div>
+                    <div class="notification-text">${notif.text}</div>
+                    <div class="notification-time">${notif.time}</div>
+                </div>
+            `).join('');
+        }
+        
+        function showHelp() { 
+            document.getElementById('helpModal').classList.add('show');
+        }
+        
+        function closeHelp() {
+            document.getElementById('helpModal').classList.remove('show');
+        }
+        
+        // Cerrar modales al hacer clic fuera
+        document.getElementById('notificationsModal').addEventListener('click', function(e) {
+            if (e.target === this) closeNotifications();
+        });
+        
+        document.getElementById('helpModal').addEventListener('click', function(e) {
+            if (e.target === this) closeHelp();
+        });
+        
+        // Imprimir reporte
+        function printReport() {
+            if (inventory.length === 0) {
+                alert('No hay datos para imprimir');
+                return;
+            }
+            
+            const printWindow = window.open('', '', 'height=600,width=800');
+            printWindow.document.write('<html><head><title>Reporte de Inventario</title>');
+            printWindow.document.write('<style>');
+            printWindow.document.write('body { font-family: Arial, sans-serif; padding: 20px; }');
+            printWindow.document.write('h1 { color: #d4af37; }');
+            printWindow.document.write('table { width: 100%; border-collapse: collapse; margin-top: 20px; }');
+            printWindow.document.write('th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }');
+            printWindow.document.write('th { background-color: #d4af37; color: #000; }');
+            printWindow.document.write('tr:nth-child(even) { background-color: #f2f2f2; }');
+            printWindow.document.write('.header { margin-bottom: 20px; }');
+            printWindow.document.write('.summary { margin: 20px 0; padding: 15px; background: #f9f9f9; border-left: 4px solid #d4af37; }');
+            printWindow.document.write('</style></head><body>');
+            printWindow.document.write('<div class="header">');
+            printWindow.document.write('<h1>ENTERPRISE INVENTORY MANAGEMENT</h1>');
+            printWindow.document.write('<p><strong>Fecha:</strong> ' + new Date().toLocaleDateString('es-MX') + '</p>');
+            printWindow.document.write('<p><strong>Hora:</strong> ' + new Date().toLocaleTimeString('es-MX') + '</p>');
+            printWindow.document.write('</div>');
+            printWindow.document.write('<div class="summary">');
+            printWindow.document.write('<h2>Resumen</h2>');
+            printWindow.document.write('<p><strong>Total de Artículos:</strong> ' + inventory.length + '</p>');
+            printWindow.document.write('<p><strong>Categorías:</strong> ' + [...new Set(inventory.map(item => item.category))].length + '</p>');
+            printWindow.document.write('</div>');
+            printWindow.document.write('<table>');
+            printWindow.document.write('<thead><tr><th>Código</th><th>Nombre</th><th>Categoría</th><th>Cantidad</th><th>Ubicación</th></tr></thead>');
+            printWindow.document.write('<tbody>');
+            inventory.forEach(item => {
+                printWindow.document.write('<tr>');
+                printWindow.document.write('<td>' + item.sku + '</td>');
+                printWindow.document.write('<td>' + item.name + '</td>');
+                printWindow.document.write('<td>' + item.category + '</td>');
+                printWindow.document.write('<td>' + item.quantity + '</td>');
+                printWindow.document.write('<td>' + item.location + '</td>');
+                printWindow.document.write('</tr>');
+            });
+            printWindow.document.write('</tbody></table>');
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.print();
+        }
+        
+        // Enviar por email
+        function emailReport() {
+            if (inventory.length === 0) {
+                alert('No hay datos para enviar');
+                return;
+            }
+            
+            const email = prompt('Ingresa el correo electrónico de destino:');
+            if (email && email.includes('@')) {
+                const subject = 'Reporte de Inventario - Enterprise IMS';
+                const body = `Reporte de Inventario generado el ${new Date().toLocaleDateString('es-MX')}
+
+Total de artículos: ${inventory.length}
+Categorías activas: ${[...new Set(inventory.map(item => item.category))].length}
+
+Este reporte contiene información detallada del inventario actual.`;
+                
+                const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.location.href = mailtoLink;
+                
+                alert('Se ha abierto tu cliente de correo. Adjunta el archivo CSV exportado para enviar el reporte completo.');
+            } else if (email) {
+                alert('Por favor ingresa un correo electrónico válido');
+            }
+        }
+        
+        function saveSettings() { alert('Configuración guardada'); }
+
+        // Cargar datos al iniciar
+        loadData();
+        updateNotificationBadge();
+    </script>
+</body>
+</html>
